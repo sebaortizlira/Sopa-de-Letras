@@ -5,10 +5,63 @@ typedef struct {
 	int tam;		//Tamaño de Matriz NxN
 } SopaDeLetras;
 
-typedef struct {
-	char** palabras;//Las Palabras
-	int num;		//Numero de Palabras
-} Palabras;
+typedef struct nodo{
+	char* palabra;
+	int cantidadPalabras;
+	struct nodo* cabecera;
+	struct nodo* sig;
+} Lista;
+
+Lista* leerPalabras()
+{
+	//Variables a usar
+	char buffer_palabras[100];										//Buffer de lectura de palabras
+	Lista* ListaPalabras = NULL;									//Estructura donde se guardaran las palabras
+	FILE* palabrasPtr = fopen("palabras.in", "r");					//Abrimos el archivo palabras.in con un Puntero FILE*
+
+	ListaPalabras = (Lista*)malloc(sizeof(Lista));
+	ListaPalabras->cabecera = ListaPalabras;						//El nodo cabecera es el primero que se crea
+
+	if (palabrasPtr == NULL) {										//El archivo se pudo leer?
+		ListaPalabras->palabra = NULL;
+		ListaPalabras->sig = NULL;
+		ListaPalabras->cantidadPalabras = -1;						//No pueden haber palabras -1, por eso es un error
+		return ListaPalabras;
+	}
+
+	//Obtenemos la cantidad de palabras en el archivo
+	fgets(buffer_palabras, 100, palabrasPtr);						//Se lee el numero de palabras a buscar
+
+	ListaPalabras->cantidadPalabras = atoi(buffer_palabras);			//Convierte la primera linea de chars en un entero
+
+	if (ListaPalabras->cantidadPalabras == 0)						//Si el numero de palabras es 0, se retorna vacio
+	{
+		ListaPalabras->palabra = NULL;
+		ListaPalabras->sig = NULL;
+		return ListaPalabras;
+	}
+
+	//Cargamos las palabras
+	while (1) {
+		if (fgets(buffer_palabras, 100, palabrasPtr) != NULL) {		//Se lee la linea, si es NULL, no hay más palabras
+			ListaPalabras->palabra = malloc(strlen(buffer_palabras)*sizeof(char)); //Asignamos espacio
+			strcpy(ListaPalabras->palabra, strtok(buffer_palabras, "\n"));				//Guardamos la palabra y eliminamos el caracter \n
+			ListaPalabras->sig = (Lista*)malloc(sizeof(Lista));		//Creamos un nuevo nodo y lo anexamos a la siguiente posición de la lista
+			
+			//Guardamos datos constantes de la lista
+			ListaPalabras->sig->cabecera = ListaPalabras->cabecera;			
+			ListaPalabras->sig->cantidadPalabras = ListaPalabras->cantidadPalabras;
+			ListaPalabras->sig->sig = NULL;
+			ListaPalabras = ListaPalabras->sig;
+		}
+		else
+			break;									//Hasta que se pueda leer
+	}
+
+	fclose(palabrasPtr);							//Cierre de archivo
+
+	return ListaPalabras->cabecera;					//Se retorna el primer elemento de la lista
+}
 
 char* generarMatriz(int M, int N)
 {
@@ -41,6 +94,20 @@ void ImprimirMatriz(char* Matriz, int M, int N, int ImprimirPosiciones)
 	}
 }
 
+void ImprimirPalabras(Lista* palabras)
+{
+	int i = 1;
+	while (palabras->sig != NULL)
+	{
+		printf("%d) %s\t", i, palabras->palabra);
+		if (strlen(palabras->palabra) < 5) printf("\t");	//Para ayudar a mostrar "columnas"
+		palabras = palabras->sig;
+		i++;
+		if (i % 2 == 1)
+			printf("\n");									//Para ayudar a mostrar "Columnas"
+	}
+}
+
 char* transponer(char* MatrizOriginal, int Fila, int Columna)
 {
 	char* MatrizTranspuesta = malloc(Fila * Columna * sizeof(char));
@@ -60,13 +127,12 @@ SopaDeLetras leerSopaDeArchivo()
 {
 	//Variables a usar
 	char	tamanio_char[10],										//Lee la primera linea con el tamaño de matriz
-			caracter;												//Iterador de caracter leido
+		caracter;												//Iterador de caracter leido
 	int		posCaracter = 0;										//Iterador para la posición de la matriz a guardar
 	SopaDeLetras sopa;												//Estructura donde se guardara la Sopa
 	FILE* sopaPtr = fopen("sopa.in", "r");							//Abrimos el archivo sopa.in con un Puntero FILE*
 
 	if (sopaPtr == NULL) {											//El archivo se pudo leer?
-		printf("Problema al leer archivo.");
 		sopa.SOPA = NULL;
 		sopa.tam = 0;
 		return sopa;
@@ -100,16 +166,28 @@ SopaDeLetras leerSopaDeArchivo()
 void main()
 {
 	/*------------------Se lee la matriz----------------------*/
-	printf("Leyendo sopa.in...\n\n");
+	printf("Leyendo sopa.in...\t");
 	SopaDeLetras sopa = leerSopaDeArchivo();
 	if (sopa.SOPA == NULL) {
-		printf("Error al leer archivo o no se encontro.");
+		printf("Error al leer archivo  sopa.in o no se encontro.");
+		return;
+	}
+	else
+		printf("Archivo leido con exito.\n");
+	/*------------------Se leen las palabras----------------------*/
+	printf("Leyendo palabras.in...\t");
+	Lista* palabras = leerPalabras();
+	if (palabras->cantidadPalabras == -1) {
+		printf("Error al leer archivo palabras.in o no se encontro.");
 		return;
 	}
 	else
 		printf("Archivo leido con exito.\n\n");
+	/*------------------Se imprimen las palabras------------------*/
+	printf("Palabras (%d): \n\n", palabras->cantidadPalabras);
+	ImprimirPalabras(palabras);
 	/*------------------Se imprime la matriz------------------*/
-	printf("Matriz (%dx%d): \n\n", sopa.tam, sopa.tam);
+	printf("\n\nMatriz (%dx%d): \n\n", sopa.tam, sopa.tam);
 	ImprimirMatriz(sopa.SOPA, sopa.tam, sopa.tam, 0);
 	/*------------------Se imprime la matriz------------------*/
 	printf("\n\nMatriz Transpuesta: \n\n");
