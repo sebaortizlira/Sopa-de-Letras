@@ -123,6 +123,23 @@ char* transponer(char* MatrizOriginal, int Fila, int Columna)
 	return MatrizTranspuesta;
 }
 
+char* invertir(char* MatrizOriginal, int Fila, int Columna)
+{
+	char* MatrizInversa = malloc(Fila * Columna * sizeof(char));
+	int totalCaracteres = Fila * Columna;
+
+	for (int i = 0; i < Fila; i++)
+	{
+		for (int j = 0; j < Columna; j++)
+		{
+			MatrizInversa[i * Fila + j] = MatrizOriginal[((i+1)* Fila-1) - j];
+		}
+		
+	}
+
+	return MatrizInversa;
+}
+
 SopaDeLetras leerSopaDeArchivo()
 {
 	//Variables a usar
@@ -165,6 +182,16 @@ SopaDeLetras leerSopaDeArchivo()
 
 void main()
 {
+	/*------------------Titulo----------------------*/
+	 printf("    ____ ____ ___  ____    ___  ____\n");
+	 printf("    [__  |  | |__] |__|    |  \ |___\n");
+	 printf("    ___] |__| |    |  |    |__/ |___\n\n");
+	 
+	 printf("    _    ____ ___ ____ ____ ____\n");
+	 printf("    |    |___  |  |__/ |__| [__\n");
+	 printf("    |___ |___  |  |  \\ |  | ___]\n\n");
+
+
 	/*------------------Se lee la matriz----------------------*/
 	printf("Leyendo sopa.in...\t");
 	SopaDeLetras sopa = leerSopaDeArchivo();
@@ -189,7 +216,13 @@ void main()
 	/*------------------Se imprime la matriz------------------*/
 	printf("\n\nMatriz (%dx%d): \n\n", sopa.tam, sopa.tam);
 	ImprimirMatriz(sopa.SOPA, sopa.tam, sopa.tam, 0);
-	/*------------------Se imprime la matriz------------------*/
+	/*------------------Se imprime la matriz transpuesta------------------*/
 	printf("\n\nMatriz Transpuesta: \n\n");
 	ImprimirMatriz(transponer(sopa.SOPA, sopa.tam, sopa.tam), sopa.tam, sopa.tam, 0);					//Se invierte el numero de filas y columnas
+	/*------------------Se imprime la matriz inversa------------------*/
+	printf("\n\nMatriz Inversa (%dx%d): \n\n", sopa.tam, sopa.tam);
+	ImprimirMatriz(invertir(sopa.SOPA, sopa.tam, sopa.tam), sopa.tam, sopa.tam, 0);
+	/*------------------Se imprime la matriz inversa transpuesta------------------*/
+	printf("\n\nMatriz Inversa Transpuesta(%dx%d): \n\n", sopa.tam, sopa.tam);
+	ImprimirMatriz(transponer(invertir(sopa.SOPA, sopa.tam, sopa.tam), sopa.tam, sopa.tam), sopa.tam, sopa.tam, 0);
 }
