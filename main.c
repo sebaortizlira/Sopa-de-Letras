@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+/*------------------Estructuras----------------------*/
 typedef struct {
 	char* SOPA;		//La Sopa
 	int tam;		//Tamaño de Matriz NxN
@@ -12,6 +13,7 @@ typedef struct nodo{
 	struct nodo* sig;
 } Lista;
 
+/*------------------I/O Archivos----------------------*/
 Lista* leerPalabras()
 {
 	//Variables a usar
@@ -63,7 +65,48 @@ Lista* leerPalabras()
 	return ListaPalabras->cabecera;					//Se retorna el primer elemento de la lista
 }
 
-char* generarMatriz(int M, int N)
+SopaDeLetras leerSopaDeArchivo()
+{
+	//Variables a usar
+	char	tamanio_char[10],										//Lee la primera linea con el tamaño de matriz
+		caracter;												//Iterador de caracter leido
+	int		posCaracter = 0;										//Iterador para la posición de la matriz a guardar
+	SopaDeLetras sopa;												//Estructura donde se guardara la Sopa
+	FILE* sopaPtr = fopen("sopa.in", "r");							//Abrimos el archivo sopa.in con un Puntero FILE*
+
+	if (sopaPtr == NULL) {											//El archivo se pudo leer?
+		sopa.SOPA = NULL;
+		sopa.tam = 0;
+		return sopa;
+	}
+
+	//Obtenemos el tamaño de la sopa leyendo la primera fila
+	fgets(tamanio_char, 10, sopaPtr);								//Se lee el tamaño de matriz primera linea archivo
+	sopa.tam = atoi(tamanio_char);									//Convierte la primera linea de chars en un entero
+
+	//Creamos la matriz
+	sopa.SOPA = malloc(sopa.tam * sopa.tam * sizeof(char));			//Reservamos el espacio
+
+	while (1) {
+		caracter = fgetc(sopaPtr);
+		if (caracter == EOF) break;									//Hasta que se pueda leer
+
+		else
+		{
+			if (caracter == ' ' || caracter == '\n') continue;		//Los saltos de linea y espacios no los debe leer
+
+			sopa.SOPA[posCaracter] = caracter;
+			posCaracter++;
+		}
+	}
+
+	fclose(sopaPtr);												//Cierre de archivo
+
+	return sopa;
+}
+
+/*------------------Funciones Matriz----------------------*/
+char* GenerarMatriz(int M, int N)
 {
 	char* Matriz = malloc(M * N * sizeof(char));					//Reservamos M*N porque es un array de 1 dim
 
@@ -108,7 +151,7 @@ void ImprimirPalabras(Lista* palabras)
 	}
 }
 
-char* transponer(char* MatrizOriginal, int Fila, int Columna)
+char* TransponerMatriz(char* MatrizOriginal, int Fila, int Columna)
 {
 	char* MatrizTranspuesta = malloc(Fila * Columna * sizeof(char));
 
@@ -123,7 +166,7 @@ char* transponer(char* MatrizOriginal, int Fila, int Columna)
 	return MatrizTranspuesta;
 }
 
-char* invertir(char* MatrizOriginal, int Fila, int Columna)
+char* InvertirMatriz(char* MatrizOriginal, int Fila, int Columna)
 {
 	char* MatrizInversa = malloc(Fila * Columna * sizeof(char));
 	int totalCaracteres = Fila * Columna;
@@ -140,51 +183,12 @@ char* invertir(char* MatrizOriginal, int Fila, int Columna)
 	return MatrizInversa;
 }
 
-SopaDeLetras leerSopaDeArchivo()
-{
-	//Variables a usar
-	char	tamanio_char[10],										//Lee la primera linea con el tamaño de matriz
-		caracter;												//Iterador de caracter leido
-	int		posCaracter = 0;										//Iterador para la posición de la matriz a guardar
-	SopaDeLetras sopa;												//Estructura donde se guardara la Sopa
-	FILE* sopaPtr = fopen("sopa.in", "r");							//Abrimos el archivo sopa.in con un Puntero FILE*
-
-	if (sopaPtr == NULL) {											//El archivo se pudo leer?
-		sopa.SOPA = NULL;
-		sopa.tam = 0;
-		return sopa;
-	}
-
-	//Obtenemos el tamaño de la sopa leyendo la primera fila
-	fgets(tamanio_char, 10, sopaPtr);								//Se lee el tamaño de matriz primera linea archivo
-	sopa.tam = atoi(tamanio_char);									//Convierte la primera linea de chars en un entero
-
-	//Creamos la matriz
-	sopa.SOPA = malloc(sopa.tam * sopa.tam * sizeof(char));			//Reservamos el espacio
-
-	while (1) {
-		caracter = fgetc(sopaPtr);
-		if (caracter == EOF) break;									//Hasta que se pueda leer
-
-		else
-		{
-			if (caracter == ' ' || caracter == '\n') continue;		//Los saltos de linea y espacios no los debe leer
-
-			sopa.SOPA[posCaracter] = caracter;
-			posCaracter++;
-		}
-	}
-
-	fclose(sopaPtr);												//Cierre de archivo
-
-	return sopa;
-}
 
 void main()
 {
 	/*------------------Titulo----------------------*/
 	 printf("    ____ ____ ___  ____    ___  ____\n");
-	 printf("    [__  |  | |__] |__|    |  \ |___\n");
+	 printf("    [__  |  | |__] |__|    |  \\ |___\n");
 	 printf("    ___] |__| |    |  |    |__/ |___\n\n");
 	 
 	 printf("    _    ____ ___ ____ ____ ____\n");
@@ -218,11 +222,11 @@ void main()
 	ImprimirMatriz(sopa.SOPA, sopa.tam, sopa.tam, 0);
 	/*------------------Se imprime la matriz transpuesta------------------*/
 	printf("\n\nMatriz Transpuesta: \n\n");
-	ImprimirMatriz(transponer(sopa.SOPA, sopa.tam, sopa.tam), sopa.tam, sopa.tam, 0);					//Se invierte el numero de filas y columnas
+	ImprimirMatriz(TransponerMatriz(sopa.SOPA, sopa.tam, sopa.tam), sopa.tam, sopa.tam, 0);					//Se invierte el numero de filas y columnas
 	/*------------------Se imprime la matriz inversa------------------*/
 	printf("\n\nMatriz Inversa (%dx%d): \n\n", sopa.tam, sopa.tam);
-	ImprimirMatriz(invertir(sopa.SOPA, sopa.tam, sopa.tam), sopa.tam, sopa.tam, 0);
+	ImprimirMatriz(InvertirMatriz(sopa.SOPA, sopa.tam, sopa.tam), sopa.tam, sopa.tam, 0);
 	/*------------------Se imprime la matriz inversa transpuesta------------------*/
 	printf("\n\nMatriz Inversa Transpuesta(%dx%d): \n\n", sopa.tam, sopa.tam);
-	ImprimirMatriz(transponer(invertir(sopa.SOPA, sopa.tam, sopa.tam), sopa.tam, sopa.tam), sopa.tam, sopa.tam, 0);
+	ImprimirMatriz(TransponerMatriz(InvertirMatriz(sopa.SOPA, sopa.tam, sopa.tam), sopa.tam, sopa.tam), sopa.tam, sopa.tam, 0);
 }
