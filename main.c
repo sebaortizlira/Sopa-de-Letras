@@ -6,7 +6,7 @@ typedef struct {
 	int tam;		//Tamaño de Matriz NxN
 } SopaDeLetras;
 
-typedef struct nodo{
+typedef struct nodo {
 	char* palabra;
 	int cantidadPalabras;
 	struct nodo* cabecera;
@@ -46,12 +46,12 @@ Lista* leerPalabras()
 	//Cargamos las palabras
 	while (1) {
 		if (fgets(buffer_palabras, 100, palabrasPtr) != NULL) {		//Se lee la linea, si es NULL, no hay más palabras
-			ListaPalabras->palabra = malloc(strlen(buffer_palabras)*sizeof(char)); //Asignamos espacio
+			ListaPalabras->palabra = malloc(strlen(buffer_palabras) * sizeof(char)); //Asignamos espacio
 			strcpy(ListaPalabras->palabra, strtok(buffer_palabras, "\n"));				//Guardamos la palabra y eliminamos el caracter \n
 			ListaPalabras->sig = (Lista*)malloc(sizeof(Lista));		//Creamos un nuevo nodo y lo anexamos a la siguiente posición de la lista
-			
+
 			//Guardamos datos constantes de la lista
-			ListaPalabras->sig->cabecera = ListaPalabras->cabecera;			
+			ListaPalabras->sig->cabecera = ListaPalabras->cabecera;
 			ListaPalabras->sig->cantidadPalabras = ListaPalabras->cantidadPalabras;
 			ListaPalabras->sig->sig = NULL;
 			ListaPalabras = ListaPalabras->sig;
@@ -175,25 +175,93 @@ char* InvertirMatriz(char* MatrizOriginal, int Fila, int Columna)
 	{
 		for (int j = 0; j < Columna; j++)
 		{
-			MatrizInversa[i * Fila + j] = MatrizOriginal[((i+1)* Fila-1) - j];
+			MatrizInversa[i * Fila + j] = MatrizOriginal[((i + 1) * Fila - 1) - j];
 		}
-		
+
 	}
 
 	return MatrizInversa;
 }
 
+/*------------------Funciones Búsqueda----------------------*/
+int BuscarEnLinea(char* Linea, char* Palabra)
+{
+	char* p1, * p2, * p3;
+	int i = 0, j = 0, flag = 0;
+
+	p1 = Linea;
+	p2 = Palabra;
+
+	for (i = 0; i < strlen(Linea); i++)
+	{
+		if (*p1 == *p2)
+		{
+			p3 = p1;
+			for (j = 0; j < strlen(Palabra); j++)
+			{
+				if (*p3 == *p2)
+				{
+					p3++; p2++;
+				}
+				else
+					break;
+			}
+			p2 = Palabra;
+			if (j == strlen(Palabra))
+			{
+				flag = 1;
+				return i;
+			}
+		}
+		p1++;
+	}
+	if (flag == 0)
+	{
+		return -1;
+	}
+}
+
+char* ObtenerLinea(SopaDeLetras Sopa, int Fila)
+{
+	char* Linea = malloc(Sopa.tam * sizeof(char)); //Guarda la linea que se leerá
+
+	for (int i = 0; i < Sopa.tam + 1; i++)//Iterar entre filas
+		*(Linea + i) = *(Sopa.SOPA + (Sopa.tam * Fila + i)); //Se copian N letras en el string
+
+	*(Linea + Sopa.tam) = '\0'; //Esto permite que los printf no lleguen hasta el proximo null en memoria
+	
+	return Linea;
+}
+
+void BuscarEnMatriz(SopaDeLetras Sopa, Lista* Palabras)
+{
+	int columna = 0; //Indica en que columna hubo palabra
+
+	while (Palabras->sig != NULL)
+	{
+		for (int i = 0; i < Sopa.tam; i++)
+		{
+			char* lineaMatriz = ObtenerLinea(Sopa, i);
+			columna = BuscarEnLinea(lineaMatriz, Palabras->palabra);
+
+			if (columna != -1)
+				printf("%s encontrada en posicion [%i,%i]\n", Palabras->palabra, i, columna);
+		}
+		Palabras = Palabras->sig;
+		printf("\n\n");
+	}
+}
 
 void main()
 {
 	/*------------------Titulo----------------------*/
-	 printf("    ____ ____ ___  ____    ___  ____\n");
-	 printf("    [__  |  | |__] |__|    |  \\ |___\n");
-	 printf("    ___] |__| |    |  |    |__/ |___\n\n");
-	 
-	 printf("    _    ____ ___ ____ ____ ____\n");
-	 printf("    |    |___  |  |__/ |__| [__\n");
-	 printf("    |___ |___  |  |  \\ |  | ___]\n\n");
+	printf("    ____ ____ ___  ____    ___  ____\n");
+	printf("    [__  |  | |__] |__|    |  \\ |___\n");
+	printf("    ___] |__| |    |  |    |__/ |___\n\n");
+
+	printf("    _    ____ ___ ____ ____ ____\n");
+	printf("    |    |___  |  |__/ |__| [__\n");
+	printf("    |___ |___  |  |  \\ |  | ___]\n\n");
 
 
 	/*------------------Se lee la matriz----------------------*/
@@ -220,6 +288,12 @@ void main()
 	/*------------------Se imprime la matriz------------------*/
 	printf("\n\nMatriz (%dx%d): \n\n", sopa.tam, sopa.tam);
 	ImprimirMatriz(sopa.SOPA, sopa.tam, sopa.tam, 0);
+
+	//BuscarEnLinea("jdbwjndjperronsjdndnj", "perro");
+	//ObtenerLinea(sopa, 1);
+	printf("\n\n");
+	BuscarEnMatriz(sopa, palabras);
+
 	/*------------------Se imprime la matriz transpuesta------------------*/
 	printf("\n\nMatriz Transpuesta: \n\n");
 	ImprimirMatriz(TransponerMatriz(sopa.SOPA, sopa.tam, sopa.tam), sopa.tam, sopa.tam, 0);					//Se invierte el numero de filas y columnas
