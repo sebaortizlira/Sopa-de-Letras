@@ -238,7 +238,6 @@ void BuscarEnMatriz(SopaDeLetras Sopa, Lista* Palabras)
 	int columna = 0; //Indica en que columna hubo palabra
 	Lista* aux = Palabras;
 
-	printf("\nMatriz Original\n");
 	while (aux->sig != NULL)
 	{
 		for (int i = 0; i < Sopa.tam; i++)
@@ -247,14 +246,13 @@ void BuscarEnMatriz(SopaDeLetras Sopa, Lista* Palabras)
 			columna = BuscarEnLinea(lineaMatriz, aux->palabra);
 
 			if (columna != -1)
-				printf("%s encontrada en posicion [%i,%i]\n", aux->palabra, i, columna);
+				printf("%s encontrada en posicion [%i,%i] (->) \n", aux->palabra, i, columna);
 		}
 		aux = aux->sig;
 	}
 
 	aux = Palabras;
 
-	printf("\nMatriz Inversa\n");
 	while (aux->sig != NULL)
 	{
 		for (int i = 0; i < Sopa.tam; i++)
@@ -263,14 +261,13 @@ void BuscarEnMatriz(SopaDeLetras Sopa, Lista* Palabras)
 			columna = BuscarEnLinea(lineaMatriz, aux->palabra);
 
 			if (columna != -1)
-				printf("%s encontrada en posicion [%i,%i]\n", aux->palabra, i, Sopa.tam - columna-1);
+				printf("%s encontrada en posicion [%i,%i] (<-)\n", aux->palabra, i, Sopa.tam - columna-1);
 		}
 		aux = aux->sig;
 	}
 
 	aux = Palabras;
 
-	printf("\nMatriz Transpuesta\n");
 	while (aux->sig != NULL)
 	{
 		for (int i = 0; i < Sopa.tam; i++)
@@ -279,24 +276,23 @@ void BuscarEnMatriz(SopaDeLetras Sopa, Lista* Palabras)
 			columna = BuscarEnLinea(lineaMatriz, aux->palabra);
 
 			if (columna != -1)
-				printf("%s encontrada en posicion [%i,%i]\n", aux->palabra, columna, i);
+				printf("%s encontrada en posicion [%i,%i] (V)\n", aux->palabra, columna, i);
 		}
 		aux = aux->sig;
 	}
 
 	aux = Palabras;
 
-	printf("\nMatriz Transpuesta Invertida\n");
 	while (aux->sig != NULL)
 	{
 		for (int i = 0; i < Sopa.tam; i++)
 		{
-			char* lineaMatriz = ObtenerLinea(TransponerMatriz(InvertirMatriz(Sopa.SOPA, Sopa.tam, Sopa.tam), Sopa.tam, Sopa.tam), Sopa.tam, i);
+			char* lineaMatriz = ObtenerLinea(InvertirMatriz(TransponerMatriz(Sopa.SOPA, Sopa.tam, Sopa.tam), Sopa.tam, Sopa.tam), Sopa.tam, i);
 
 			columna = BuscarEnLinea(lineaMatriz, aux->palabra);
 
 			if (columna != -1)
-				printf("%s encontrada en posicion [%i,%i]\n", aux->palabra, columna, Sopa.tam - i-1);
+				printf("%s encontrada en posicion [%i,%i] (A) \n", aux->palabra, Sopa.tam - columna - 1, i);
 		}
 		aux = aux->sig;
 	}
@@ -346,13 +342,15 @@ void main()
 	printf("\n\n");
 	BuscarEnMatriz(sopa, palabras);
 
-	/*------------------Se imprime la matriz transpuesta------------------*/
-	printf("\n\nMatriz Transpuesta: \n\n");
-	ImprimirMatriz(TransponerMatriz(sopa.SOPA, sopa.tam, sopa.tam), sopa.tam, sopa.tam, 0);					//Se invierte el numero de filas y columnas
-	/*------------------Se imprime la matriz inversa------------------*/
-	printf("\n\nMatriz Inversa (%dx%d): \n\n", sopa.tam, sopa.tam);
-	ImprimirMatriz(InvertirMatriz(sopa.SOPA, sopa.tam, sopa.tam), sopa.tam, sopa.tam, 0);
-	/*------------------Se imprime la matriz inversa transpuesta------------------*/
-	printf("\n\nMatriz Inversa Transpuesta(%dx%d): \n\n", sopa.tam, sopa.tam);
-	ImprimirMatriz(TransponerMatriz(InvertirMatriz(sopa.SOPA, sopa.tam, sopa.tam), sopa.tam, sopa.tam), sopa.tam, sopa.tam, 0);
+
+//
+//	/*------------------Se imprime la matriz transpuesta------------------*/
+//	printf("\n\nMatriz Transpuesta: \n\n");
+//	ImprimirMatriz(TransponerMatriz(sopa.SOPA, sopa.tam, sopa.tam), sopa.tam, sopa.tam, 0);					//Se invierte el numero de filas y columnas
+//	/*------------------Se imprime la matriz inversa------------------*/
+//	printf("\n\nMatriz Inversa (%dx%d): \n\n", sopa.tam, sopa.tam);
+//	ImprimirMatriz(InvertirMatriz(sopa.SOPA, sopa.tam, sopa.tam), sopa.tam, sopa.tam, 0);
+//	/*------------------Se imprime la matriz inversa transpuesta------------------*/
+//	printf("\n\nMatriz Inversa Transpuesta(%dx%d): \n\n", sopa.tam, sopa.tam);
+//	ImprimirMatriz(InvertirMatriz(TransponerMatriz(sopa.SOPA, sopa.tam, sopa.tam), sopa.tam, sopa.tam), sopa.tam, sopa.tam, 0);
 }
