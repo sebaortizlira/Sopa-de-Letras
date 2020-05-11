@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <time.h>
 
 /*------------------Estructuras----------------------*/
 typedef struct {
@@ -340,9 +341,16 @@ void main()
 	//BuscarEnLinea("jdbwjndjperronsjdndnj", "perro");
 	//ObtenerLinea(sopa, 1);
 	printf("\n\n");
+
+	clock_t t;
+	t = clock();
+
 	BuscarEnMatriz(sopa, palabras);
 
+	t = clock() - t;
+	double tiempoBusqueda = ((double)t) / CLOCKS_PER_SEC;
 
+	printf("\nTiempo de busqueda: %f segundos \n", tiempoBusqueda);
 //
 //	/*------------------Se imprime la matriz transpuesta------------------*/
 //	printf("\n\nMatriz Transpuesta: \n\n");
