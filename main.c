@@ -221,14 +221,14 @@ int BuscarEnLinea(char* Linea, char* Palabra)
 	}
 }
 
-char* ObtenerLinea(SopaDeLetras Sopa, int Fila)
+char* ObtenerLinea(char* Matriz, int Columnas, int Fila)
 {
-	char* Linea = malloc(Sopa.tam * sizeof(char)); //Guarda la linea que se leerá
+	char* Linea = malloc(Columnas * sizeof(char)); //Guarda la linea que se leerá
 
-	for (int i = 0; i < Sopa.tam + 1; i++)//Iterar entre filas
-		*(Linea + i) = *(Sopa.SOPA + (Sopa.tam * Fila + i)); //Se copian N letras en el string
+	for (int i = 0; i < Columnas + 1; i++)//iterador de caracteres en una fila
+		*(Linea + i) = *(Matriz + (Columnas * Fila + i)); //Se copian N letras en el string
 
-	*(Linea + Sopa.tam) = '\0'; //Esto permite que los printf no lleguen hasta el proximo null en memoria
+	*(Linea + Columnas) = '\0'; //Esto permite que los printf no lleguen hasta el proximo null en memoria
 	
 	return Linea;
 }
@@ -236,21 +236,73 @@ char* ObtenerLinea(SopaDeLetras Sopa, int Fila)
 void BuscarEnMatriz(SopaDeLetras Sopa, Lista* Palabras)
 {
 	int columna = 0; //Indica en que columna hubo palabra
+	Lista* aux = Palabras;
 
-	while (Palabras->sig != NULL)
+	printf("\nMatriz Original\n");
+	while (aux->sig != NULL)
 	{
 		for (int i = 0; i < Sopa.tam; i++)
 		{
-			char* lineaMatriz = ObtenerLinea(Sopa, i);
-			columna = BuscarEnLinea(lineaMatriz, Palabras->palabra);
+			char* lineaMatriz = ObtenerLinea(Sopa.SOPA, Sopa.tam, i);
+			columna = BuscarEnLinea(lineaMatriz, aux->palabra);
 
 			if (columna != -1)
-				printf("%s encontrada en posicion [%i,%i]\n", Palabras->palabra, i, columna);
+				printf("%s encontrada en posicion [%i,%i]\n", aux->palabra, i, columna);
 		}
-		Palabras = Palabras->sig;
-		printf("\n\n");
+		aux = aux->sig;
+	}
+
+	aux = Palabras;
+
+	printf("\nMatriz Inversa\n");
+	while (aux->sig != NULL)
+	{
+		for (int i = 0; i < Sopa.tam; i++)
+		{
+			char* lineaMatriz = ObtenerLinea(InvertirMatriz(Sopa.SOPA, Sopa.tam, Sopa.tam), Sopa.tam, i);
+			columna = BuscarEnLinea(lineaMatriz, aux->palabra);
+
+			if (columna != -1)
+				printf("%s encontrada en posicion [%i,%i]\n", aux->palabra, i, Sopa.tam - columna-1);
+		}
+		aux = aux->sig;
+	}
+
+	aux = Palabras;
+
+	printf("\nMatriz Transpuesta\n");
+	while (aux->sig != NULL)
+	{
+		for (int i = 0; i < Sopa.tam; i++)
+		{
+			char* lineaMatriz = ObtenerLinea(TransponerMatriz(Sopa.SOPA, Sopa.tam, Sopa.tam), Sopa.tam, i);
+			columna = BuscarEnLinea(lineaMatriz, aux->palabra);
+
+			if (columna != -1)
+				printf("%s encontrada en posicion [%i,%i]\n", aux->palabra, columna, i);
+		}
+		aux = aux->sig;
+	}
+
+	aux = Palabras;
+
+	printf("\nMatriz Transpuesta Invertida\n");
+	while (aux->sig != NULL)
+	{
+		for (int i = 0; i < Sopa.tam; i++)
+		{
+			char* lineaMatriz = ObtenerLinea(TransponerMatriz(InvertirMatriz(Sopa.SOPA, Sopa.tam, Sopa.tam), Sopa.tam, Sopa.tam), Sopa.tam, i);
+
+			columna = BuscarEnLinea(lineaMatriz, aux->palabra);
+
+			if (columna != -1)
+				printf("%s encontrada en posicion [%i,%i]\n", aux->palabra, columna, Sopa.tam - i-1);
+		}
+		aux = aux->sig;
 	}
 }
+
+
 
 void main()
 {
